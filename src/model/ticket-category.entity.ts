@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { SeatTypeEnum } from './enums/seat-type.enum';
 import { EventSeatStatus } from './event-seat-status.entity';
 import { TicketRequestCategory } from './ticket-request.category.entity';
@@ -25,7 +32,10 @@ export class TicketCategory {
   colorCode: string;
 
   // Many TicketCategories belong to one Event
-  @ManyToOne(() => Event, (event) => event.ticketCategories, { nullable: false, onDelete: 'CASCADE' })
+  @ManyToOne(() => Event, (event) => event.ticketCategories, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'event_id', referencedColumnName: 'id' })
   event: Event;
 

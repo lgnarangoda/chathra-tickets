@@ -6,11 +6,7 @@ import { UserModule } from './user/user.module';
 import { ConfigsModule } from './config/configs.module';
 
 @Module({
-  imports: [
-    AuthModule,
-    UserModule,
-    ConfigsModule
-  ],
+  imports: [AuthModule, UserModule, ConfigsModule],
   controllers: [AppController],
   providers: [AppService],
 })

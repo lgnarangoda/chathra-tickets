@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { SeatStatusEnum } from './enums/seat-status.enum';
 import { EventTypeEnum } from './enums/event-type.enum';
 import { EventStatusEnum } from './enums/event-status.enum';
@@ -48,7 +55,10 @@ export class Event extends BaseEntity {
   ticketCategories: TicketCategory[];
 
   // One event has one venue (owning side)
-  @OneToOne(() => Venue, (venue) => venue.event, { nullable: false, onDelete: 'RESTRICT' })
+  @OneToOne(() => Venue, (venue) => venue.event, {
+    nullable: false,
+    onDelete: 'RESTRICT',
+  })
   @JoinColumn({ name: 'venue_id', referencedColumnName: 'id' })
   venue: Venue;
 }

@@ -4,6 +4,21 @@ import { configurations } from './configs';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
+type TypeOrmConfig = {
+  type: 'postgres';
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  schema: string;
+  database: string;
+  dropSchema: boolean;
+  entities: string[];
+  migrations: string[];
+  autoLoadEntities: boolean;
+  synchronize: boolean;
+};
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -13,16 +28,16 @@ import { DataSource } from 'typeorm';
     }),
 
     TypeOrmModule.forRootAsync({
-      useFactory: async (configService: ConfigService): Promise<TypeOrmModuleOptions> => {
-        const dbConfig = configService.get('TYPEORM');
+      useFactory: async (
+        configService: ConfigService,
+      ): Promise<TypeOrmModuleOptions> => {
+        const dbConfig = configService.get<TypeOrmConfig>('TYPEORM');
 
         if (!dbConfig) {
           throw new Error('Database configuration not found');
         }
         try {
-          const dataSource = new DataSource({
-            ...dbConfig,
-          });
+          const dataSource = new DataSource(dbConfig);
 
           await dataSource.initialize();
           console.log('Database connected successfully');
@@ -30,8 +45,8 @@ import { DataSource } from 'typeorm';
 
           return {
             ...dbConfig,
-            logging: false
-          };
+            logging: false,
+          } as TypeOrmModuleOptions;
         } catch (error) {
           console.error('Database connection error:', error);
           throw new Error('Database connection error');

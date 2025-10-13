@@ -1,9 +1,4 @@
-import {
-  Column,
-  UpdateDateColumn,
-  CreateDateColumn,
-} from 'typeorm';
-
+import { Column, UpdateDateColumn, CreateDateColumn } from 'typeorm';
 
 export class BaseEntity {
   @Column({ type: 'varchar', name: 'created_by', length: 255, nullable: false })

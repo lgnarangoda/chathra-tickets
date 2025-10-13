@@ -31,6 +31,23 @@
 $ npm install
 ```
 
+## Database Setup
+
+This project uses PostgreSQL as the database. To run PostgreSQL locally using Docker:
+
+```bash
+# Start PostgreSQL database
+$ npm run db:start
+
+# Stop PostgreSQL database
+$ npm run db:stop
+```
+
+The database will be available at `localhost:5432` with the following default credentials:
+- Username: `postgres`
+- Password: `root`
+- Database: `postgres`
+
 ## Compile and run the project
 
 ```bash
