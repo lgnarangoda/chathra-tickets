@@ -20,6 +20,9 @@ export class User {
   @Column({ type: 'varchar', length: 50, unique: true, nullable: false })
   role: string;
 
+  @Column({ type: 'boolean', default: false })
+  isAdmin: boolean;
+
   // Optional one-to-one link to a Customer. Keeping it nullable for backward compatibility.
   @OneToOne(() => Customer, (customer) => customer.user, {
     nullable: true,

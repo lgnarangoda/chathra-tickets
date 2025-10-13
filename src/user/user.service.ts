@@ -24,6 +24,7 @@ export class UserService {
     const newUser = this.userRepository.create({
       username: createUserDto.username,
       passwordHash,
+      isAdmin: false,
     });
     const saved = await this.userRepository.save(newUser);
 
