@@ -14,25 +14,19 @@ export enum Environment {
   Testing = 'testing',
 }
 
-const APPConfig = registerAs(
-  ConfigKey.App, () => ({
-    env:
-      Environment[process.env.NODE_ENV as keyof typeof Environment] ||
-      'dev',
-    port: Number(process.env.APP_PORT),
-    appName: process.env.APP_NAME,
-  }),
-);
+const APPConfig = registerAs(ConfigKey.App, () => ({
+  env: Environment[process.env.NODE_ENV as keyof typeof Environment] || 'dev',
+  port: Number(process.env.APP_PORT),
+  appName: process.env.APP_NAME,
+}));
 
-const DBConfig = registerAs(
-  ConfigKey.Db, () => ({
-    host: process.env.DATABASE_HOST,
-    port: Number(process.env.DATABASE_PORT),
-    username: process.env.DATABASE_USERNAME,
-    password: process.env.DATABASE_PASSWORD,
-    database: process.env.DATABASE,
-  }),
-);
+const DBConfig = registerAs(ConfigKey.Db, () => ({
+  host: process.env.DATABASE_HOST,
+  port: Number(process.env.DATABASE_PORT),
+  username: process.env.DATABASE_USERNAME,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE,
+}));
 
 const TypeOrmConfig = registerAs(ConfigKey.Type, () => ({
   type: 'postgres',
@@ -41,7 +35,7 @@ const TypeOrmConfig = registerAs(ConfigKey.Type, () => ({
   username: process.env.DATABASE_USERNAME || 'postgres',
   password: process.env.DATABASE_PASSWORD || 'root',
   schema: process.env.DATABASE_SCHEMA || 'public',
-  database: process.env.DATABASE|| 'postgres',
+  database: process.env.DATABASE || 'postgres',
   dropSchema: process.env.DROP_SCHEMA === 'true',
   entities: ['dist/**/*.entity{.ts,.js}'],
   migrations: ['dist/migrations/*{.ts,.js}'],

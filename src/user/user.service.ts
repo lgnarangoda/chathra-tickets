@@ -14,7 +14,7 @@ export class UserService {
 
   async create(
     createUserDto: CreateUserDto,
-  ): Promise<Pick<User, 'id' | 'username' | 'isAdmin'>> {
+  ): Promise<{ id: number; email: string; name: string }> {
     if (!createUserDto.password) {
       throw new Error('Password is required');
     }
@@ -22,22 +22,22 @@ export class UserService {
     const passwordHash = await bcrypt.hash(createUserDto.password, salt);
 
     const newUser = this.userRepository.create({
-      username: createUserDto.username,
+      email: createUserDto.username, // Map username to email
+      name: createUserDto.username, // Also set name to username
       passwordHash,
     });
     const saved = await this.userRepository.save(newUser);
 
     // Do not expose password_hash in the response
-    const safeUser: Pick<User, 'id' | 'username' | 'isAdmin'> = {
-      id: saved.id,
-      username: saved.username,
-      isAdmin: saved.isAdmin,
+    return {
+      id: saved.userId,
+      email: saved.email,
+      name: saved.name,
     };
-    return safeUser;
   }
 
-  async findOne(username: string): Promise<User | undefined> {
-    const user = await this.userRepository.findOne({ where: { username } });
+  async findOne(email: string): Promise<User | undefined> {
+    const user = await this.userRepository.findOne({ where: { email } });
     return user ?? undefined;
   }
 }

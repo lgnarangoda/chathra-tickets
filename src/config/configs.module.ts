@@ -13,7 +13,9 @@ import { DataSource } from 'typeorm';
     }),
 
     TypeOrmModule.forRootAsync({
-      useFactory: async (configService: ConfigService): Promise<TypeOrmModuleOptions> => {
+      useFactory: async (
+        configService: ConfigService,
+      ): Promise<TypeOrmModuleOptions> => {
         const dbConfig = configService.get('TYPEORM');
 
         if (!dbConfig) {
@@ -30,7 +32,7 @@ import { DataSource } from 'typeorm';
 
           return {
             ...dbConfig,
-            logging: false
+            logging: false,
           };
         } catch (error) {
           console.error('Database connection error:', error);

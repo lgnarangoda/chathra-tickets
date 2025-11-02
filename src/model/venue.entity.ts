@@ -1,18 +1,49 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
-import { Event } from './event.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { EventVenue } from './event-venue.entity';
+import { VenueStatus } from './enums/venue-status.enum';
 
-@Entity()
+@Entity('venue')
 export class Venue {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'venue_id' })
+  venueId: number;
 
-  @Column({ type: 'varchar', length: 255, unique: true, nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   name: string;
 
-  @Column({ name: 'seat_map_json', type: 'text' })
-  seatMapJson: string;
+  @Column({ type: 'text', nullable: true })
+  address: string;
 
-  // One venue is associated with one event (inverse side)
-  @OneToOne(() => Event, (event) => event.venue)
-  event: Event;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  city: string;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  country: string;
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  zip: string;
+
+  @Column({ type: 'decimal', precision: 10, scale: 8, nullable: true })
+  latitude: number;
+
+  @Column({ type: 'decimal', precision: 11, scale: 8, nullable: true })
+  longitude: number;
+
+  @Column({ type: 'varchar', length: 100, name: 'venue_type', nullable: true })
+  venueType: string;
+
+  @Column({ type: 'boolean', name: 'is_parking_available', default: false })
+  isParkingAvailable: boolean;
+
+  @Column({ type: 'json', name: 'seat_map', nullable: true })
+  seatMap: any;
+
+  @Column({
+    type: 'enum',
+    enum: VenueStatus,
+    default: VenueStatus.ACTIVE,
+  })
+  status: VenueStatus;
+
+  @OneToMany(() => EventVenue, (eventVenue) => eventVenue.venue)
+  eventVenues: EventVenue[];
 }

@@ -1,42 +1,65 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
-import { SeatTypeEnum } from './enums/seat-type.enum';
-import { EventSeatStatus } from './event-seat-status.entity';
-import { TicketRequestCategory } from './ticket-request.category.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Event } from './event.entity';
+import { TicketSubEvent } from './ticket-sub-event.entity';
+import { Ticket } from './ticket.entity';
+import { TicketCategoryStatus } from './enums/ticket-category-status.enum';
 
-@Entity()
+@Entity('ticket_category')
 export class TicketCategory {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'ticket_category_id' })
+  ticketCategoryId: number;
 
-  @Column({ type: 'varchar', length: 255, unique: true, nullable: false })
+  @Column({ type: 'bigint', name: 'event_id', nullable: true })
+  eventId: number;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
   name: string;
 
-  @Column({ type: 'bigint', nullable: false })
-  value: number;
+  @Column({ type: 'text', nullable: true })
+  description: string;
 
-  @Column({ type: 'bigint' })
-  count: number;
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    name: 'base_price',
+    nullable: true,
+  })
+  basePrice: number;
 
-  @Column({ type: 'enum', enum: SeatTypeEnum, nullable: false })
-  status: SeatTypeEnum;
+  @Column({ type: 'int', name: 'max_quantity', nullable: true })
+  maxQuantity: number;
 
-  @Column({ name: 'color_code', type: 'varchar', length: 255 })
-  colorCode: string;
+  @Column({ type: 'int', name: 'min_quantity', nullable: true })
+  minQuantity: number;
 
-  // Many TicketCategories belong to one Event
-  @ManyToOne(() => Event, (event) => event.ticketCategories, { nullable: false, onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'event_id', referencedColumnName: 'id' })
+  @Column({
+    type: 'varchar',
+    length: 50,
+    default: TicketCategoryStatus.ACTIVE,
+  })
+  status: TicketCategoryStatus;
+
+  @Column({ type: 'text', name: 'seat_map', nullable: true })
+  seatMap: string;
+
+  @ManyToOne(() => Event, (event) => event.ticketCategories)
+  @JoinColumn({ name: 'event_id' })
   event: Event;
 
   @OneToMany(
-    () => EventSeatStatus,
-    (eventSeatStatus) => eventSeatStatus.ticketCategory,
-    { cascade: true },
+    () => TicketSubEvent,
+    (ticketSubEvent) => ticketSubEvent.ticketCategory,
   )
-  eventSeatStatuses: EventSeatStatus[];
+  ticketSubEvents: TicketSubEvent[];
 
-  // One TicketCategory can be referenced in many TicketRequestCategory rows
-  @OneToMany(() => TicketRequestCategory, (trc) => trc.ticketCategory)
-  ticketRequestCategories: TicketRequestCategory[];
+  @OneToMany(() => Ticket, (ticket) => ticket.ticketCategory)
+  tickets: Ticket[];
 }
