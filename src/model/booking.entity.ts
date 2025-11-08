@@ -2,10 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 import { Event } from './event.entity';
@@ -13,16 +15,24 @@ import { Ticket } from './ticket.entity';
 import { Payment } from './payment.entity';
 import { BookingStatus } from './enums/booking-status.enum';
 import { BookingPaymentStatus } from './enums/payment-status.enum';
+import { BaseEntity } from './base.entity';
 
 @Entity('booking')
-export class Booking {
+@Index(['userId'])
+@Index(['eventId'])
+@Index(['status'])
+@Index(['paymentStatus'])
+@Index(['createdOn'])
+@Index(['userId', 'status'])
+@Index(['eventId', 'status'])
+export class Booking extends BaseEntity{
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'booking_id' })
   bookingId: number;
 
-  @Column({ type: 'bigint', name: 'user_id', nullable: true })
+  @Column({ type: 'bigint', name: 'user_id', nullable: false })
   userId: number;
 
-  @Column({ type: 'bigint', name: 'event_id', nullable: true })
+  @Column({ type: 'bigint', name: 'event_id', nullable: false })
   eventId: number;
 
   @Column({
@@ -37,9 +47,6 @@ export class Booking {
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   referrer: string;
-  // created date time
-  @CreateDateColumn({ type: 'timestamp', name: 'booking_time' })
-  bookingTime: Date;
 
   @Column({
     type: 'decimal',
@@ -58,17 +65,21 @@ export class Booking {
   })
   paymentStatus: BookingPaymentStatus;
 
-  @ManyToOne(() => User, (user) => user.bookings)
+  @ManyToOne(() => User, (user) => user.bookings, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => Event, (event) => event.bookings)
+  @ManyToOne(() => Event, (event) => event.bookings, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'event_id' })
   event: Event;
 
-  @OneToMany(() => Ticket, (ticket) => ticket.booking)
+  @OneToMany(() => Ticket, (ticket) => ticket.booking, {
+    cascade: true,
+  })
   tickets: Ticket[];
 
-  @OneToMany(() => Payment, (payment) => payment.booking)
+  @OneToMany(() => Payment, (payment) => payment.booking, {
+    cascade: true,
+  })
   payments: Payment[];
 }

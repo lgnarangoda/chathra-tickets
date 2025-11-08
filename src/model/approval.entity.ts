@@ -1,7 +1,7 @@
 import {
   Column,
-  CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToOne,
@@ -10,9 +10,13 @@ import {
 import { ChangeRequest } from './change-request.entity';
 import { User } from './user.entity';
 import { ApprovalStatus } from './enums/approval-status.enum';
+import { BaseEntity } from './base.entity';
 
 @Entity('approval')
-export class Approval {
+@Index(['changeRequestId'])
+@Index(['approverId'])
+@Index(['approvalStatus'])
+export class Approval extends BaseEntity{
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'approval_id' })
   approvalId: number;
 
@@ -22,7 +26,7 @@ export class Approval {
   @Column({ type: 'bigint', name: 'approver_id', nullable: true })
   approverId: number;
 
-  @CreateDateColumn({ type: 'timestamp', name: 'approved_at' })
+  @Column({ type: 'timestamp', name: 'approved_at', nullable: true })
   approvedAt: Date;
 
   @Column({
@@ -36,12 +40,14 @@ export class Approval {
   @Column({ type: 'text', name: 'approval_notes', nullable: true })
   approvalNotes: string;
 
-  @OneToOne(() => ChangeRequest, (changeRequest) => changeRequest.approval)
+  // Approval owns the foreign key to ChangeRequest
+  @OneToOne(() => ChangeRequest, (changeRequest) => changeRequest.approval, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'change_request_id' })
   changeRequest: ChangeRequest;
 
-  //ont to one
-  @ManyToOne(() => User, (user) => user.approvals)
+  @ManyToOne(() => User, (user) => user.approvals, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'approver_id' })
   approver: User;
 }

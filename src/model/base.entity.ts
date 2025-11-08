@@ -1,12 +1,14 @@
 import {
-  Column,
   UpdateDateColumn,
   CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
-
+import { User } from './user.entity';
 
 export class BaseEntity {
-  @Column({ type: 'varchar', name: 'created_by', length: 255, nullable: false })
+  @ManyToOne(() => User, (user) => user.promotions, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'created_by' })
   createdBy: string;
 
   @CreateDateColumn({
@@ -19,6 +21,7 @@ export class BaseEntity {
   @UpdateDateColumn({ name: 'updated_on', type: 'timestamptz' })
   updatedOn: Date;
 
-  @Column({ type: 'varchar', name: 'updated_by', length: 255, nullable: false })
+  @ManyToOne(() => User, (user) => user.promotions, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'updated_by' })
   updatedBy: string;
 }

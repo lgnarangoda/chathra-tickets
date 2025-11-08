@@ -2,20 +2,29 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Event } from './event.entity';
 import { User } from './user.entity';
 import { PromotionStatus } from './enums/promotion-status.enum';
+import { BaseEntity } from './base.entity';
 
 @Entity('promotion')
-export class Promotion {
+@Index(['eventId'])
+@Index(['code'])
+@Index(['isActive'])
+@Index(['promotionStatus'])
+@Index(['validFrom'])
+@Index(['validTo'])
+export class Promotion extends BaseEntity{
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'promotion_id' })
   promotionId: number;
 
-  @Column({ type: 'bigint', name: 'event_id', nullable: true })
+  @Column({ type: 'bigint', name: 'event_id', nullable: false })
   eventId: number;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
@@ -106,17 +115,9 @@ export class Promotion {
   @Column({ type: 'varchar', length: 20, name: 'color_code', nullable: true })
   colorCode: string;
 
-  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
-  createdAt: Date;
-
-  @Column({ type: 'bigint', name: 'created_by', nullable: true })
-  createdById: number;
-
-  @ManyToOne(() => Event, (event) => event.promotions)
+  @ManyToOne(() => Event, (event) => event.promotions, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'event_id' })
   event: Event;
-
-  @ManyToOne(() => User, (user) => user.promotions)
-  @JoinColumn({ name: 'created_by' })
-  createdBy: User;
 }

@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToOne,
@@ -11,9 +12,13 @@ import { User } from './user.entity';
 import { Approval } from './approval.entity';
 import { EntityType } from './enums/entity-type.enum';
 import { ChangeRequestApprovalStatus } from './enums/approval-status.enum';
+import { BaseEntity } from './base.entity';
 
 @Entity('change_request')
-export class ChangeRequest {
+@Index(['entityType'])
+@Index(['submittedById'])
+@Index(['approvalStatus'])
+export class ChangeRequest extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'change_request_id' })
   changeRequestId: number;
 
@@ -34,9 +39,6 @@ export class ChangeRequest {
   @Column({ type: 'bigint', name: 'submitted_by', nullable: true })
   submittedById: number;
 
-  @CreateDateColumn({ type: 'timestamp', name: 'submitted_at' })
-  submittedAt: Date;
-
   @Column({
     type: 'enum',
     enum: ChangeRequestApprovalStatus,
@@ -45,17 +47,16 @@ export class ChangeRequest {
   })
   approvalStatus: ChangeRequestApprovalStatus;
 
-  @Column({ type: 'bigint', name: 'approval_id', nullable: true })
-  approvalId: number;
-
   @Column({ type: 'text', nullable: true })
   notes: string;
 
-  @ManyToOne(() => User, (user) => user.changeRequests)
+  @ManyToOne(() => User, (user) => user.changeRequests, {
+    onDelete: 'RESTRICT',
+  })
   @JoinColumn({ name: 'submitted_by' })
   submittedBy: User;
 
+  // Inverse relationship - Approval owns the foreign key
   @OneToOne(() => Approval, (approval) => approval.changeRequest)
-  @JoinColumn({ name: 'approval_id' })
   approval: Approval;
 }

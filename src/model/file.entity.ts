@@ -4,17 +4,14 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Organizer } from './organizer.entity';
-import { OrganizerDocument } from './organizer-document.entity';
 import { Event } from './event.entity';
-import { SubEventResourcePerson } from './sub-event-resource-person.entity';
 import { ResourcePerson } from './resource-person.entity';
+import { BaseEntity } from './base.entity';
 
 @Entity('file')
-export class File {
+export class File extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'file_id' })
   fileId: number;
 
@@ -27,26 +24,11 @@ export class File {
   @Column({ type: 'varchar', length: 50, name: 'file_type', nullable: true })
   fileType: string;
 
-  @CreateDateColumn({ type: 'timestamp', name: 'uploaded_at' })
-  uploadedAt: Date;
-
   @Column({ type: 'varchar', length: 500, name: 'file_url' })
   fileUrl: string;
 
-  @OneToMany(() => Organizer, (organizer) => organizer.profileImage)
-  organizersUsingAsProfile: Organizer[];
-
-  @OneToMany(
-    () => OrganizerDocument,
-    (organizerDocument) => organizerDocument.file,
-  )
-  organizerDocuments: OrganizerDocument[];
-
-  @OneToMany(
-    () => SubEventResourcePerson,
-    (subEventResourcePerson) => subEventResourcePerson.profileImageFile,
-  )
-  subEventResourcePersons: SubEventResourcePerson[];
+  // Note: Reverse relationships are handled automatically by TypeORM
+  // through the @ManyToOne relationships in related entities
 
   @ManyToOne(() => Event, (event) => event.files, { nullable: true })
   @JoinColumn({ name: 'event_id' })

@@ -1,12 +1,11 @@
 import {
   Column,
-  CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 import { Organizer } from './organizer.entity';
 import { File } from './file.entity';
@@ -19,13 +18,22 @@ import { EventMode } from './enums/event-mode.enum';
 import { EventCategory } from './enums/event-category.enum';
 import { EventApprovalStatus } from './enums/event-approval-status.enum';
 import { EventStatus } from './enums/event-status.enum';
+import { BaseEntity } from './base.entity';
 
 @Entity('event')
-export class Event {
+@Index(['organizerId'])
+@Index(['status'])
+@Index(['isPublished'])
+@Index(['approvalStatus'])
+@Index(['startDateTime'])
+@Index(['endDateTime'])
+@Index(['organizerId', 'status'])
+@Index(['isPublished', 'status'])
+export class Event extends BaseEntity{
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'event_id' })
   eventId: number;
 
-  @Column({ type: 'bigint', name: 'organizer_id', nullable: true })
+  @Column({ type: 'bigint', name: 'organizer_id', nullable: false })
   organizerId: number;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
@@ -116,12 +124,6 @@ export class Event {
   @Column({ type: 'int', name: 'max_capacity', nullable: true })
   maxCapacity: number;
 
-  @UpdateDateColumn({ type: 'timestamp', name: 'last_modified_at' })
-  lastModifiedAt: Date;
-
-  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
-  createdAt: Date;
-
   @Column({ type: 'int', default: 1 })
   version: number;
 
@@ -149,25 +151,44 @@ export class Event {
   })
   status: EventStatus;
 
-  @ManyToOne(() => Organizer, (organizer) => organizer.events)
+  @ManyToOne(() => Organizer, (organizer) => organizer.events, {
+    onDelete: 'RESTRICT',
+  })
   @JoinColumn({ name: 'organizer_id' })
   organizer: Organizer;
 
-  @OneToMany(() => SubEvent, (subEvent) => subEvent.event)
+  @OneToMany(() => SubEvent, (subEvent) => subEvent.event, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   subEvents: SubEvent[];
 
-  @OneToMany(() => EventVenue, (eventVenue) => eventVenue.event)
+  @OneToMany(() => EventVenue, (eventVenue) => eventVenue.event, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   eventVenues: EventVenue[];
 
-  @OneToMany(() => TicketCategory, (ticketCategory) => ticketCategory.event)
+  @OneToMany(() => TicketCategory, (ticketCategory) => ticketCategory.event, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   ticketCategories: TicketCategory[];
 
-  @OneToMany(() => Booking, (booking) => booking.event)
+  @OneToMany(() => Booking, (booking) => booking.event, {
+    onDelete: 'RESTRICT',
+  })
   bookings: Booking[];
 
-  @OneToMany(() => Promotion, (promotion) => promotion.event)
+  @OneToMany(() => Promotion, (promotion) => promotion.event, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   promotions: Promotion[];
 
-  @OneToMany(() => File, (file) => file.event)
+  @OneToMany(() => File, (file) => file.event, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   files: File[];
 }

@@ -30,15 +30,19 @@ export class OrganizerDocument {
   @Column({ type: 'bigint', name: 'submitted_by', nullable: true })
   submittedById: number;
 
-  @ManyToOne(() => Organizer, (organizer) => organizer.documents)
+  @ManyToOne(() => Organizer, (organizer) => organizer.documents, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'organizer_id' })
   organizer: Organizer;
 
-  @ManyToOne(() => File, { nullable: true })
+  @ManyToOne(() => File, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'file_id' })
   file: File;
 
-  @ManyToOne(() => User, (user) => user.submittedDocuments)
+  @ManyToOne(() => User, (user) => user.submittedDocuments, {
+    onDelete: 'RESTRICT',
+  })
   @JoinColumn({ name: 'submitted_by' })
   submittedBy: User;
 }

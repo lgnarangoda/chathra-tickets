@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -10,16 +11,21 @@ import { File } from './file.entity';
 import { OrganizerDocument } from './organizer-document.entity';
 import { Event } from './event.entity';
 import { OrganizerStatus } from './enums/organizer-status.enum';
+import { BaseEntity } from './base.entity';
 
 @Entity('organizer')
-export class Organizer {
+@Index(['email'])
+@Index(['phone'])
+@Index(['status'])
+@Index(['nicOrBrNumber'])
+export class Organizer extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'organizer_id' })
   organizerId: number;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: false })
   name: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: false, unique: true })
   email: string;
 
   @Column({ type: 'varchar', length: 20, nullable: true })
@@ -49,6 +55,7 @@ export class Organizer {
     length: 50,
     name: 'nic_or_br_number',
     nullable: true,
+    unique: true,
   })
   nicOrBrNumber: string;
 
@@ -62,13 +69,18 @@ export class Organizer {
   })
   status: OrganizerStatus;
 
-  @ManyToOne(() => File, { nullable: true })
+  @ManyToOne(() => File, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'profile_image_id' })
   profileImage: File;
 
-  @OneToMany(() => OrganizerDocument, (doc) => doc.organizer)
+  @OneToMany(() => OrganizerDocument, (doc) => doc.organizer, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   documents: OrganizerDocument[];
 
-  @OneToMany(() => Event, (event) => event.organizer)
+  @OneToMany(() => Event, (event) => event.organizer, {
+    onDelete: 'RESTRICT',
+  })
   events: Event[];
 }

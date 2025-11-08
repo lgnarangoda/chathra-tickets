@@ -11,13 +11,14 @@ import { SubEventResourcePerson } from './sub-event-resource-person.entity';
 import { TicketSubEvent } from './ticket-sub-event.entity';
 import { SubEventApprovalStatus } from './enums/sub-event-approval-status.enum';
 import { SubEventStatus } from './enums/sub-event-status.enum';
+import { BaseEntity } from './base.entity';
 
 @Entity('sub_event')
-export class SubEvent {
+export class SubEvent extends BaseEntity{
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'sub_event_id' })
   subEventId: number;
 
-  @Column({ type: 'bigint', name: 'event_id', nullable: true })
+  @Column({ type: 'bigint', name: 'event_id', nullable: false })
   eventId: number;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
@@ -62,16 +63,25 @@ export class SubEvent {
   })
   status: SubEventStatus;
 
-  @ManyToOne(() => Event, (event) => event.subEvents)
+  @ManyToOne(() => Event, (event) => event.subEvents, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'event_id' })
   event: Event;
 
   @OneToMany(
     () => SubEventResourcePerson,
     (subEventResourcePerson) => subEventResourcePerson.subEvent,
+    {
+      cascade: true,
+      onDelete: 'CASCADE',
+    },
   )
   resourcePersons: SubEventResourcePerson[];
 
-  @OneToMany(() => TicketSubEvent, (ticketSubEvent) => ticketSubEvent.subEvent)
+  @OneToMany(() => TicketSubEvent, (ticketSubEvent) => ticketSubEvent.subEvent, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   ticketSubEvents: TicketSubEvent[];
 }

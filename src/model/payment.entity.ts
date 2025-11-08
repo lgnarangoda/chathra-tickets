@@ -2,21 +2,27 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Booking } from './booking.entity';
 import { Refund } from './refund.entity';
 import { PaymentStatus } from './enums/payment-status.enum';
+import { BaseEntity } from './base.entity';
 
 @Entity('payment')
-export class Payment {
+@Index(['bookingId'])
+@Index(['status'])
+@Index(['createdOn'])
+export class Payment extends BaseEntity{
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'payment_id' })
   paymentId: number;
 
-  @Column({ type: 'bigint', name: 'booking_id', nullable: true })
+  @Column({ type: 'bigint', name: 'booking_id', nullable: false })
   bookingId: number;
 
   @Column({
@@ -29,9 +35,6 @@ export class Payment {
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   amount: number;
-
-  @CreateDateColumn({ type: 'timestamp', name: 'payment_time' })
-  paymentTime: Date;
 
   @Column({
     type: 'enum',
@@ -57,10 +60,14 @@ export class Payment {
   gatewayName: string;
 
   //for one payment there can be only one booking
-  @ManyToOne(() => Booking, (booking) => booking.payments)
+  @ManyToOne(() => Booking, (booking) => booking.payments, {
+    onDelete: 'RESTRICT',
+  })
   @JoinColumn({ name: 'booking_id' })
   booking: Booking;
   //for one payment there can be only one refund
-  @OneToMany(() => Refund, (refund) => refund.payment)
+  @OneToMany(() => Refund, (refund) => refund.payment, {
+    cascade: true,
+  })
   refunds: Refund[];
 }

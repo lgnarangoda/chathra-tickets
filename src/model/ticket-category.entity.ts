@@ -16,7 +16,7 @@ export class TicketCategory {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'ticket_category_id' })
   ticketCategoryId: number;
 
-  @Column({ type: 'bigint', name: 'event_id', nullable: true })
+  @Column({ type: 'bigint', name: 'event_id', nullable: false })
   eventId: number;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
@@ -50,16 +50,24 @@ export class TicketCategory {
   @Column({ type: 'text', name: 'seat_map', nullable: true })
   seatMap: string;
 
-  @ManyToOne(() => Event, (event) => event.ticketCategories)
+  @ManyToOne(() => Event, (event) => event.ticketCategories, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'event_id' })
   event: Event;
 
   @OneToMany(
     () => TicketSubEvent,
     (ticketSubEvent) => ticketSubEvent.ticketCategory,
+    {
+      cascade: true,
+      onDelete: 'CASCADE',
+    },
   )
   ticketSubEvents: TicketSubEvent[];
 
-  @OneToMany(() => Ticket, (ticket) => ticket.ticketCategory)
+  @OneToMany(() => Ticket, (ticket) => ticket.ticketCategory, {
+    onDelete: 'RESTRICT',
+  })
   tickets: Ticket[];
 }
