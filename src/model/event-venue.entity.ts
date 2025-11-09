@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Event } from './event.entity';
-import { Venue } from './venue.entity';
+import { Venue } from '../venue/model/venue.entity';
 
 @Entity('event_venue')
 export class EventVenue {

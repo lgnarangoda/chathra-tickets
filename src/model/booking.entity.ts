@@ -1,13 +1,11 @@
 import {
   Column,
-  CreateDateColumn,
   Entity,
   Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 import { Event } from './event.entity';
@@ -25,7 +23,7 @@ import { BaseEntity } from './base.entity';
 @Index(['createdOn'])
 @Index(['userId', 'status'])
 @Index(['eventId', 'status'])
-export class Booking extends BaseEntity{
+export class Booking extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'booking_id' })
   bookingId: number;
 

@@ -34,7 +34,7 @@ const TypeOrmConfig = registerAs(ConfigKey.Type, () => ({
   port: Number(process.env.DATABASE_PORT) || 5432,
   username: process.env.DATABASE_USERNAME || 'postgres',
   password: process.env.DATABASE_PASSWORD || 'root',
-  schema: process.env.DATABASE_SCHEMA || 'public',
+  schema: process.env.DATABASE_SCHEMA || 'chathra',
   database: process.env.DATABASE || 'postgres',
   dropSchema: process.env.DROP_SCHEMA === 'true',
   entities: ['dist/**/*.entity{.ts,.js}'],

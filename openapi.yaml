@@ -1,0 +1,1348 @@
+openapi: 3.0.3
+info:
+  title: Chathra API
+  version: 1.1.0
+  description: |
+    OpenAPI definition for the Chathra NestJS service.
+    Use this document to explore the available endpoints and their payloads.
+servers:
+  - url: http://localhost:3000/v1
+    description: Local development server (v1)
+paths:
+  /v1:
+    get:
+      summary: Get service status
+      description: Returns a simple text message to confirm the API is reachable.
+      operationId: getRoot
+      responses:
+        '200':
+          description: Successful response containing the greeting message.
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: Welcome to the Chathra API!
+  /v1/user/register:
+    post:
+      summary: Register a new user
+      description: Creates a user account using the provided username and password.
+      operationId: registerUser
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+            examples:
+              default:
+                value:
+                  username: user@example.com
+                  password: MySecureP@ssw0rd
+      responses:
+        '201':
+          description: User registered successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegistrationResponse'
+              example:
+                id: 1
+                email: user@example.com
+                name: user@example.com
+        '400':
+          description: Validation error or missing required fields.
+  /v1/auth/login:
+    post:
+      summary: Authenticate and obtain an access token
+      description: Authenticates the user using username and password credentials and returns a JWT access token.
+      operationId: login
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              default:
+                value:
+                  username: user@example.com
+                  password: MySecureP@ssw0rd
+      responses:
+        '200':
+          description: Authentication successful. Returns a JWT access token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+              example:
+                access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '401':
+          description: Invalid credentials or user not authorized.
+  /v1/auth/profile:
+    get:
+      summary: Get the current authenticated user's profile
+      description: Returns the user claims extracted from the provided JWT access token.
+      operationId: getProfile
+      tags:
+        - Authentication
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successfully retrieved the authenticated user's profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+              example:
+                userId: 1
+                email: user@example.com
+                name: John Doe
+        '401':
+          description: Missing, invalid, or expired JWT access token.
+  /v1/venues:
+    post:
+      summary: Create a venue
+      description: Creates a venue record with the provided details.
+      operationId: createVenue
+      tags:
+        - Venue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VenueDto'
+            examples:
+              default:
+                value:
+                  name: Grand Hall
+                  address: 123 Event Street
+                  city: Colombo
+                  country: Sri Lanka
+                  zip: 00100
+                  venueType: indoor
+                  isParkingAvailable: true
+                  status: ACTIVE
+                  latitude: 6.9271
+                  longitude: 79.8612
+      responses:
+        '201':
+          description: Venue created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VenueDto'
+        '400':
+          description: Validation error or missing required fields.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    UserRegistrationRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          format: email
+          description: Email address that will be used as both username and display name.
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          description: Plain-text password that will be hashed before storage.
+          minLength: 8
+          example: MySecureP@ssw0rd
+    UserRegistrationResponse:
+      type: object
+      required:
+        - id
+        - email
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Auto generated identifier of the new user.
+        email:
+          type: string
+          format: email
+          description: Email address associated with the user.
+        name:
+          type: string
+          description: Display name of the user.
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          format: email
+          description: Email address used during registration.
+        password:
+          type: string
+          format: password
+          description: Plain-text password for authentication.
+    LoginResponse:
+      type: object
+      required:
+        - access_token
+      properties:
+        access_token:
+          type: string
+          description: JWT access token to be used for authenticated requests.
+    UserProfile:
+      type: object
+      description: User details resolved from the validated JWT payload.
+      required:
+        - userId
+        - email
+        - name
+      properties:
+        userId:
+          type: integer
+          format: int64
+          description: Unique identifier of the authenticated user.
+        email:
+          type: string
+          format: email
+          description: Email address associated with the token.
+        name:
+          type: string
+          description: Display name of the authenticated user.
+    ApprovalStatus:
+      type: string
+      enum:
+        - pending
+        - approved
+        - rejected
+    ChangeRequestApprovalStatus:
+      type: string
+      enum:
+        - pending
+        - approved
+        - rejected
+    BookingStatus:
+      type: string
+      enum:
+        - confirmed
+        - cancelled
+        - refunded
+    BookingPaymentStatus:
+      type: string
+      enum:
+        - active
+        - inactive
+        - suspended
+        - archived
+    PaymentStatus:
+      type: string
+      enum:
+        - success
+        - failed
+        - pending
+    EntityType:
+      type: string
+      enum:
+        - event
+        - sub_event
+    EventMode:
+      type: string
+      enum:
+        - online
+        - offline
+        - hybrid
+    EventCategory:
+      type: string
+      enum:
+        - concert
+        - conference
+        - workshop
+        - seminar
+        - festival
+        - sports
+        - theater
+        - other
+    EventApprovalStatus:
+      type: string
+      enum:
+        - pending
+        - approved
+        - rejected
+    EventStatus:
+      type: string
+      enum:
+        - active
+        - inactive
+        - suspended
+        - archived
+    OrganizerStatus:
+      type: string
+      enum:
+        - active
+        - inactive
+        - suspended
+        - archived
+    PromotionStatus:
+      type: string
+      enum:
+        - active
+        - inactive
+        - suspended
+        - archived
+    RefundStatus:
+      type: string
+      enum:
+        - initiated
+        - completed
+        - failed
+    ResourcePersonStatus:
+      type: string
+      enum:
+        - active
+        - inactive
+        - suspended
+        - archived
+    SubEventApprovalStatus:
+      type: string
+      enum:
+        - pending
+        - approved
+        - rejected
+    SubEventStatus:
+      type: string
+      enum:
+        - active
+        - inactive
+        - suspended
+        - archived
+    TicketCategoryStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - SOLD_OUT
+    TicketStatus:
+      type: string
+      enum:
+        - valid
+        - used
+        - cancelled
+        - refunded
+    TicketSubEventStatus:
+      type: string
+      enum:
+        - active
+        - inactive
+        - suspended
+        - archived
+    UserStatus:
+      type: string
+      enum:
+        - active
+        - inactive
+        - suspended
+        - archived
+    VenueStatus:
+      type: string
+      enum:
+        - active
+        - inactive
+        - suspended
+        - archived
+    BaseDto:
+      type: object
+      properties:
+        createdBy:
+          type: string
+          description: Identifier of the user who created the record.
+          nullable: true
+        createdOn:
+          type: string
+          format: date-time
+          description: Timestamp when the record was created.
+        updatedOn:
+          type: string
+          format: date-time
+          description: Timestamp when the record was last updated.
+        updatedBy:
+          type: string
+          description: Identifier of the user who last updated the record.
+          nullable: true
+    ApprovalDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseDto'
+        - type: object
+          required:
+            - approvalId
+            - approvalStatus
+          properties:
+            approvalId:
+              type: integer
+              format: int64
+            changeRequestId:
+              type: integer
+              format: int64
+              nullable: true
+            approverId:
+              type: integer
+              format: int64
+              nullable: true
+            approvedAt:
+              type: string
+              format: date-time
+              nullable: true
+            approvalStatus:
+              $ref: '#/components/schemas/ApprovalStatus'
+            approvalNotes:
+              type: string
+              nullable: true
+            changeRequest:
+              $ref: '#/components/schemas/ChangeRequestDto'
+              nullable: true
+            approver:
+              $ref: '#/components/schemas/UserDto'
+              nullable: true
+    BookingDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseDto'
+        - type: object
+          required:
+            - bookingId
+            - userId
+            - eventId
+            - status
+            - isTest
+            - paymentStatus
+          properties:
+            bookingId:
+              type: integer
+              format: int64
+            userId:
+              type: integer
+              format: int64
+            eventId:
+              type: integer
+              format: int64
+            status:
+              $ref: '#/components/schemas/BookingStatus'
+            isTest:
+              type: boolean
+            referrer:
+              type: string
+              nullable: true
+            totalAmount:
+              type: number
+              format: double
+              nullable: true
+            paymentStatus:
+              $ref: '#/components/schemas/BookingPaymentStatus'
+            user:
+              $ref: '#/components/schemas/UserDto'
+              nullable: true
+            event:
+              $ref: '#/components/schemas/EventDto'
+              nullable: true
+            tickets:
+              type: array
+              items:
+                $ref: '#/components/schemas/TicketDto'
+              nullable: true
+            payments:
+              type: array
+              items:
+                $ref: '#/components/schemas/PaymentDto'
+              nullable: true
+    ChangeRequestDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseDto'
+        - type: object
+          required:
+            - changeRequestId
+            - approvalStatus
+          properties:
+            changeRequestId:
+              type: integer
+              format: int64
+            entityType:
+              $ref: '#/components/schemas/EntityType'
+              nullable: true
+            originalEntityId:
+              type: integer
+              format: int64
+              nullable: true
+            draftEntityId:
+              type: integer
+              format: int64
+              nullable: true
+            submittedById:
+              type: integer
+              format: int64
+              nullable: true
+            approvalStatus:
+              $ref: '#/components/schemas/ChangeRequestApprovalStatus'
+            notes:
+              type: string
+              nullable: true
+            submittedBy:
+              $ref: '#/components/schemas/UserDto'
+              nullable: true
+            approval:
+              $ref: '#/components/schemas/ApprovalDto'
+              nullable: true
+    EventVenueDto:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          format: int64
+        eventId:
+          type: integer
+          format: int64
+          nullable: true
+        venueId:
+          type: integer
+          format: int64
+          nullable: true
+        event:
+          $ref: '#/components/schemas/EventDto'
+          nullable: true
+        venue:
+          $ref: '#/components/schemas/VenueDto'
+          nullable: true
+    EventDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseDto'
+        - type: object
+          required:
+            - eventId
+            - organizerId
+            - isFeatured
+            - isPublished
+            - isCancelled
+            - version
+            - isDraft
+            - approvalStatus
+            - status
+          properties:
+            eventId:
+              type: integer
+              format: int64
+            organizerId:
+              type: integer
+              format: int64
+            name:
+              type: string
+              nullable: true
+            eventSlug:
+              type: string
+              nullable: true
+            description:
+              type: string
+              nullable: true
+            location:
+              type: string
+              nullable: true
+            address:
+              type: string
+              nullable: true
+            country:
+              type: string
+              nullable: true
+            city:
+              type: string
+              nullable: true
+            thumbnailImageId:
+              type: integer
+              format: int64
+              nullable: true
+            coverImageId:
+              type: integer
+              format: int64
+              nullable: true
+            imageGalleryIds:
+              type: array
+              items:
+                type: integer
+                format: int64
+              nullable: true
+            startDateTime:
+              type: string
+              format: date-time
+              nullable: true
+            endDateTime:
+              type: string
+              format: date-time
+              nullable: true
+            language:
+              type: string
+              nullable: true
+            eventMode:
+              $ref: '#/components/schemas/EventMode'
+              nullable: true
+            eventCategory:
+              $ref: '#/components/schemas/EventCategory'
+              nullable: true
+            ageLimit:
+              type: integer
+              nullable: true
+            timezone:
+              type: string
+              nullable: true
+            organizerNotes:
+              type: string
+              nullable: true
+            bookingTerms:
+              type: string
+              nullable: true
+            cancellationPolicy:
+              type: string
+              nullable: true
+            isFeatured:
+              type: boolean
+            isPublished:
+              type: boolean
+            isCancelled:
+              type: boolean
+            maxCapacity:
+              type: integer
+              nullable: true
+            version:
+              type: integer
+            isDraft:
+              type: boolean
+            parentEventId:
+              type: integer
+              format: int64
+              nullable: true
+            approvalStatus:
+              $ref: '#/components/schemas/EventApprovalStatus'
+            tags:
+              type: array
+              items:
+                type: string
+              nullable: true
+            status:
+              $ref: '#/components/schemas/EventStatus'
+            organizer:
+              $ref: '#/components/schemas/OrganizerDto'
+              nullable: true
+            subEvents:
+              type: array
+              items:
+                $ref: '#/components/schemas/SubEventDto'
+              nullable: true
+            eventVenues:
+              type: array
+              items:
+                $ref: '#/components/schemas/EventVenueDto'
+              nullable: true
+            ticketCategories:
+              type: array
+              items:
+                $ref: '#/components/schemas/TicketCategoryDto'
+              nullable: true
+            bookings:
+              type: array
+              items:
+                $ref: '#/components/schemas/BookingDto'
+              nullable: true
+            promotions:
+              type: array
+              items:
+                $ref: '#/components/schemas/PromotionDto'
+              nullable: true
+            files:
+              type: array
+              items:
+                $ref: '#/components/schemas/FileDto'
+              nullable: true
+    FileDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseDto'
+        - type: object
+          required:
+            - fileId
+            - fileUrl
+          properties:
+            fileId:
+              type: integer
+              format: int64
+            eventId:
+              type: integer
+              format: int64
+              nullable: true
+            resourcePersonId:
+              type: integer
+              format: int64
+              nullable: true
+            fileType:
+              type: string
+              nullable: true
+            fileUrl:
+              type: string
+            event:
+              $ref: '#/components/schemas/EventDto'
+              nullable: true
+            resourcePerson:
+              $ref: '#/components/schemas/ResourcePersonDto'
+              nullable: true
+    OrganizerDocumentDto:
+      type: object
+      required:
+        - id
+        - organizerId
+        - fileId
+        - uploadedAt
+      properties:
+        id:
+          type: integer
+          format: int64
+        organizerId:
+          type: integer
+          format: int64
+        fileId:
+          type: integer
+          format: int64
+        docType:
+          type: string
+          nullable: true
+        uploadedAt:
+          type: string
+          format: date-time
+        submittedById:
+          type: integer
+          format: int64
+          nullable: true
+        organizer:
+          $ref: '#/components/schemas/OrganizerDto'
+          nullable: true
+        file:
+          $ref: '#/components/schemas/FileDto'
+          nullable: true
+        submittedBy:
+          $ref: '#/components/schemas/UserDto'
+          nullable: true
+    OrganizerDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseDto'
+        - type: object
+          required:
+            - organizerId
+            - name
+            - email
+            - status
+          properties:
+            organizerId:
+              type: integer
+              format: int64
+            name:
+              type: string
+            email:
+              type: string
+              format: email
+            phone:
+              type: string
+              nullable: true
+            organizationType:
+              type: string
+              nullable: true
+            businessType:
+              type: string
+              nullable: true
+            description:
+              type: string
+              nullable: true
+            nicOrBrNumber:
+              type: string
+              nullable: true
+            profileImageId:
+              type: integer
+              format: int64
+              nullable: true
+            status:
+              $ref: '#/components/schemas/OrganizerStatus'
+            profileImage:
+              $ref: '#/components/schemas/FileDto'
+              nullable: true
+            documents:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrganizerDocumentDto'
+              nullable: true
+            events:
+              type: array
+              items:
+                $ref: '#/components/schemas/EventDto'
+              nullable: true
+    PaymentDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseDto'
+        - type: object
+          required:
+            - paymentId
+            - bookingId
+            - status
+          properties:
+            paymentId:
+              type: integer
+              format: int64
+            bookingId:
+              type: integer
+              format: int64
+            paymentMethod:
+              type: string
+              nullable: true
+            amount:
+              type: number
+              format: double
+              nullable: true
+            status:
+              $ref: '#/components/schemas/PaymentStatus'
+            gatewayReferenceId:
+              type: string
+              nullable: true
+            gatewayName:
+              type: string
+              nullable: true
+            booking:
+              $ref: '#/components/schemas/BookingDto'
+              nullable: true
+            refunds:
+              type: array
+              items:
+                $ref: '#/components/schemas/RefundDto'
+              nullable: true
+    PromotionDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseDto'
+        - type: object
+          required:
+            - promotionId
+            - eventId
+            - promotionStatus
+            - isStackable
+            - isActive
+          properties:
+            promotionId:
+              type: integer
+              format: int64
+            eventId:
+              type: integer
+              format: int64
+            name:
+              type: string
+              nullable: true
+            code:
+              type: string
+              nullable: true
+            maxDiscountAmount:
+              type: number
+              format: double
+              nullable: true
+            discountType:
+              type: string
+              nullable: true
+            discountValue:
+              type: number
+              format: double
+              nullable: true
+            validFrom:
+              type: string
+              format: date-time
+              nullable: true
+            validTo:
+              type: string
+              format: date-time
+              nullable: true
+            maxUses:
+              type: integer
+              nullable: true
+            maxUsesPerUser:
+              type: integer
+              nullable: true
+            minPurchaseAmount:
+              type: number
+              format: double
+              nullable: true
+            applicableTicketCategories:
+              type: array
+              items:
+                type: string
+              nullable: true
+            promotionType:
+              type: string
+              nullable: true
+            promotionStatus:
+              $ref: '#/components/schemas/PromotionStatus'
+            isStackable:
+              type: boolean
+            isActive:
+              type: boolean
+            colorName:
+              type: string
+              nullable: true
+            colorCode:
+              type: string
+              nullable: true
+            event:
+              $ref: '#/components/schemas/EventDto'
+              nullable: true
+    RefundDto:
+      type: object
+      required:
+        - refundId
+        - paymentId
+        - refundTime
+        - status
+      properties:
+        refundId:
+          type: integer
+          format: int64
+        paymentId:
+          type: integer
+          format: int64
+        refundAmount:
+          type: number
+          format: double
+          nullable: true
+        refundTime:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          $ref: '#/components/schemas/RefundStatus'
+        refundedById:
+          type: integer
+          format: int64
+          nullable: true
+        payment:
+          $ref: '#/components/schemas/PaymentDto'
+          nullable: true
+        refundedBy:
+          $ref: '#/components/schemas/UserDto'
+          nullable: true
+    ResourcePersonDto:
+      type: object
+      required:
+        - resourcePersonId
+        - status
+      properties:
+        resourcePersonId:
+          type: integer
+          format: int64
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/ResourcePersonStatus'
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileDto'
+          nullable: true
+        subEventResourcePersons:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubEventResourcePersonDto'
+          nullable: true
+    RoleDto:
+      type: object
+      required:
+        - roleId
+        - name
+      properties:
+        roleId:
+          type: integer
+          format: int64
+        name:
+          type: string
+        userRoles:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserRoleDto'
+          nullable: true
+    SubEventResourcePersonDto:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          format: int64
+        subEventId:
+          type: integer
+          format: int64
+          nullable: true
+        resourcePersonId:
+          type: integer
+          format: int64
+          nullable: true
+        profileImage:
+          type: integer
+          format: int64
+          nullable: true
+        imageGalleryIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+          nullable: true
+        subEvent:
+          $ref: '#/components/schemas/SubEventDto'
+          nullable: true
+        resourcePerson:
+          $ref: '#/components/schemas/ResourcePersonDto'
+          nullable: true
+        profileImageFile:
+          $ref: '#/components/schemas/FileDto'
+          nullable: true
+    SubEventDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseDto'
+        - type: object
+          required:
+            - subEventId
+            - eventId
+            - version
+            - isDraft
+            - approvalStatus
+            - status
+          properties:
+            subEventId:
+              type: integer
+              format: int64
+            eventId:
+              type: integer
+              format: int64
+            name:
+              type: string
+              nullable: true
+            startTime:
+              type: string
+              format: date-time
+              nullable: true
+            endTime:
+              type: string
+              format: date-time
+              nullable: true
+            thumbnailImageId:
+              type: integer
+              format: int64
+              nullable: true
+            coverImageId:
+              type: integer
+              format: int64
+              nullable: true
+            imageGalleryIds:
+              type: array
+              items:
+                type: integer
+                format: int64
+              nullable: true
+            version:
+              type: integer
+            isDraft:
+              type: boolean
+            parentSubEventId:
+              type: integer
+              format: int64
+              nullable: true
+            approvalStatus:
+              $ref: '#/components/schemas/SubEventApprovalStatus'
+            status:
+              $ref: '#/components/schemas/SubEventStatus'
+            event:
+              $ref: '#/components/schemas/EventDto'
+              nullable: true
+            resourcePersons:
+              type: array
+              items:
+                $ref: '#/components/schemas/SubEventResourcePersonDto'
+              nullable: true
+            ticketSubEvents:
+              type: array
+              items:
+                $ref: '#/components/schemas/TicketSubEventDto'
+              nullable: true
+    TicketCategoryDto:
+      type: object
+      required:
+        - ticketCategoryId
+        - eventId
+        - status
+      properties:
+        ticketCategoryId:
+          type: integer
+          format: int64
+        eventId:
+          type: integer
+          format: int64
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        basePrice:
+          type: number
+          format: double
+          nullable: true
+        maxQuantity:
+          type: integer
+          nullable: true
+        minQuantity:
+          type: integer
+          nullable: true
+        status:
+          $ref: '#/components/schemas/TicketCategoryStatus'
+        seatMap:
+          type: string
+          nullable: true
+        event:
+          $ref: '#/components/schemas/EventDto'
+          nullable: true
+        ticketSubEvents:
+          type: array
+          items:
+            $ref: '#/components/schemas/TicketSubEventDto'
+          nullable: true
+        tickets:
+          type: array
+          items:
+            $ref: '#/components/schemas/TicketDto'
+          nullable: true
+    TicketSubEventDto:
+      type: object
+      required:
+        - id
+        - status
+      properties:
+        id:
+          type: integer
+          format: int64
+        status:
+          $ref: '#/components/schemas/TicketSubEventStatus'
+        ticketCategoryId:
+          type: integer
+          format: int64
+          nullable: true
+        subEventId:
+          type: integer
+          format: int64
+          nullable: true
+        ticketCategory:
+          $ref: '#/components/schemas/TicketCategoryDto'
+          nullable: true
+        subEvent:
+          $ref: '#/components/schemas/SubEventDto'
+          nullable: true
+    TicketDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseDto'
+        - type: object
+          required:
+            - ticketId
+            - ticketCategoryId
+            - userId
+            - isCheckedIn
+            - bookingId
+            - status
+          properties:
+            ticketId:
+              type: integer
+              format: int64
+            ticketCategoryId:
+              type: integer
+              format: int64
+            userId:
+              type: integer
+              format: int64
+            qrCodeUrl:
+              type: string
+              nullable: true
+            ticketNumber:
+              type: string
+              nullable: true
+            isCheckedIn:
+              type: boolean
+            bookingId:
+              type: integer
+              format: int64
+            status:
+              $ref: '#/components/schemas/TicketStatus'
+            ticketCategory:
+              $ref: '#/components/schemas/TicketCategoryDto'
+              nullable: true
+            user:
+              $ref: '#/components/schemas/UserDto'
+              nullable: true
+            booking:
+              $ref: '#/components/schemas/BookingDto'
+              nullable: true
+    UserRoleDto:
+      type: object
+      required:
+        - id
+        - userId
+        - roleId
+      properties:
+        id:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+        roleId:
+          type: integer
+          format: int64
+        user:
+          $ref: '#/components/schemas/UserDto'
+          nullable: true
+        role:
+          $ref: '#/components/schemas/RoleDto'
+          nullable: true
+    UserDto:
+      type: object
+      required:
+        - userId
+        - email
+        - passwordHash
+        - status
+        - isGuest
+        - createdAt
+        - updatedAt
+      properties:
+        userId:
+          type: integer
+          format: int64
+        name:
+          type: string
+          nullable: true
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          nullable: true
+        passwordHash:
+          type: string
+        status:
+          $ref: '#/components/schemas/UserStatus'
+        isGuest:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        userRoles:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserRoleDto'
+          nullable: true
+        submittedDocuments:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizerDocumentDto'
+          nullable: true
+        changeRequests:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChangeRequestDto'
+          nullable: true
+        tickets:
+          type: array
+          items:
+            $ref: '#/components/schemas/TicketDto'
+          nullable: true
+        bookings:
+          type: array
+          items:
+            $ref: '#/components/schemas/BookingDto'
+          nullable: true
+        refunds:
+          type: array
+          items:
+            $ref: '#/components/schemas/RefundDto'
+          nullable: true
+        promotions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PromotionDto'
+          nullable: true
+        approvals:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovalDto'
+          nullable: true
+    VenueDto:
+      type: object
+      properties:
+        venueId:
+          type: integer
+          format: int64
+        name:
+          type: string
+          nullable: true
+        address:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        zip:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          format: double
+          nullable: true
+        longitude:
+          type: number
+          format: double
+          nullable: true
+        venueType:
+          type: string
+          nullable: true
+        isParkingAvailable:
+          type: boolean
+          default: false
+        seatMap:
+          type: object
+          additionalProperties: true
+          nullable: true
+        status:
+          allOf:
+            - $ref: '#/components/schemas/VenueStatus'
+          default: ACTIVE
+        eventVenues:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventVenueDto'
+          nullable: true
+

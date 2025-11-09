@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { EventVenue } from './event-venue.entity';
-import { VenueStatus } from './enums/venue-status.enum';
+import { EventVenue } from '../../model/event-venue.entity';
+import { VenueStatus } from '../../model/enums/venue-status.enum';
 
 @Entity('venue')
 export class Venue {
