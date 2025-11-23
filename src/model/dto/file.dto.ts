@@ -1,5 +1,5 @@
 import { BaseDto } from './base.dto';
-import type { EventDto } from './event.dto';
+import type { EventDto } from '../../event/model/dto/event.dto';
 import type { ResourcePersonDto } from './resource-person.dto';
 
 export class FileDto extends BaseDto {

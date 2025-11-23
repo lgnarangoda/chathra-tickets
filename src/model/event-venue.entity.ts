@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Event } from './event.entity';
+import { Event } from '../event/model/eventData.entity';
 import { Venue } from '../venue/model/venue.entity';
 
 @Entity('event_venue')

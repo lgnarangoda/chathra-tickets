@@ -1,6 +1,6 @@
 export enum RefundStatus {
-  INITIATED = 'initiated',
-  COMPLETED = 'completed',
-  FAILED = 'failed',
+  INITIATED = 'INITIATED',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
 }
 

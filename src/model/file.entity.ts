@@ -6,7 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Event } from './event.entity';
+import { Event } from '../event/model/eventData.entity';
 import { ResourcePerson } from './resource-person.entity';
 import { BaseEntity } from './base.entity';
 

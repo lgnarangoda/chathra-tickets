@@ -6,7 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Organizer } from './organizer.entity';
+import { Organizer } from '../organizer/model/organizer.entity';
 import { File } from './file.entity';
 import { User } from './user.entity';
 

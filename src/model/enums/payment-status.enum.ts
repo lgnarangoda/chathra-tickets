@@ -1,13 +1,13 @@
 export enum PaymentStatus {
-  SUCCESS = 'success',
-  FAILED = 'failed',
-  PENDING = 'pending',
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
+  PENDING = 'PENDING',
 }
 
 export enum BookingPaymentStatus {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-  SUSPENDED = 'suspended',
-  ARCHIVED = 'archived',
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  SUSPENDED = 'SUSPENDED',
+  ARCHIVED = 'ARCHIVED',
 }
 

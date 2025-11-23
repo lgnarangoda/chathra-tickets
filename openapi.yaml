@@ -139,6 +139,616 @@ paths:
                 $ref: '#/components/schemas/VenueDto'
         '400':
           description: Validation error or missing required fields.
+    get:
+      summary: List venues
+      description: Returns a paginated list of venues.
+      operationId: listVenues
+      tags:
+        - Venue
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+          required: false
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          required: false
+        - in: query
+          name: sort
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: Paginated venues
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VenueDto'
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+                  total:
+                    type: integer
+                  nextPage:
+                    type: integer
+                    nullable: true
+  /v1/events:
+    post:
+      summary: Create an event
+      description: Creates an event.
+      operationId: createEvent
+      tags:
+        - Event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventDto'
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Event created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDto'
+    get:
+      summary: List events
+      description: Returns a paginated list of events.
+      operationId: listEvents
+      tags:
+        - Event
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - in: query
+          name: sort
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Paginated events
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EventDto'
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+                  total:
+                    type: integer
+                  nextPage:
+                    type: integer
+                    nullable: true
+  /v1/events/{eventId}:
+    get:
+      summary: Get event by id
+      operationId: getEventById
+      tags:
+        - Event
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDto'
+        '404':
+          description: Not found
+  /v1/events/{eventId}/status:
+    patch:
+      summary: Update event status
+      operationId: updateEventStatus
+      tags:
+        - Event
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  $ref: '#/components/schemas/EventStatus'
+              required:
+                - status
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDto'
+  /v1/events/{eventId}/ticket-categories:
+    get:
+      summary: List ticket categories by event
+      operationId: listTicketCategoriesByEvent
+      tags:
+        - TicketCategory
+        - Event
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: include
+          schema:
+            type: string
+          description: Comma separated list of includes, e.g. tickets,subEvents
+      responses:
+        '200':
+          description: Ticket categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TicketCategoryDto'
+  /v1/events/{eventId}/tickets:
+    get:
+      summary: List tickets by event
+      operationId: listTicketsByEvent
+      tags:
+        - Ticket
+        - Event
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tickets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TicketDto'
+  /v1/events/{eventId}/payments:
+    get:
+      summary: List payments by event
+      operationId: listPaymentsByEvent
+      tags:
+        - Payment
+        - Event
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Payments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentDto'
+  /v1/events/{eventId}/promotions:
+    get:
+      summary: List promotions by event
+      operationId: listPromotionsByEvent
+      tags:
+        - Promotion
+        - Event
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Promotions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PromotionDto'
+  /v1/events/{eventId}/refunds:
+    get:
+      summary: List refunds by event
+      operationId: listRefundsByEvent
+      tags:
+        - Refund
+        - Event
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Refunds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RefundDto'
+  /v1/events/{eventId}/sub-events:
+    get:
+      summary: List sub events by event
+      operationId: listSubEventsByEvent
+      tags:
+        - SubEvent
+        - Event
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Sub events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubEventDto'
+  /v1/sub-events:
+    post:
+      summary: Create sub event
+      operationId: createSubEvent
+      tags:
+        - SubEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubEventDto'
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Sub event created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubEventDto'
+  /v1/sub-events/{subEventId}:
+    get:
+      summary: Get sub event by id
+      operationId: getSubEventById
+      tags:
+        - SubEvent
+      parameters:
+        - in: path
+          name: subEventId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Sub event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubEventDto'
+        '404':
+          description: Not found
+  /v1/sub-events/{subEventId}/status:
+    patch:
+      summary: Update sub event status
+      operationId: updateSubEventStatus
+      tags:
+        - SubEvent
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: subEventId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  $ref: '#/components/schemas/SubEventStatus'
+              required:
+                - status
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubEventDto'
+  /v1/organizers:
+    post:
+      summary: Create organizer
+      operationId: createOrganizer
+      tags:
+        - Organizer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizerDto'
+      responses:
+        '201':
+          description: Organizer created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizerDto'
+        '400':
+          description: Validation error or missing required fields.
+  /v1/organizers/by-event/{eventId}:
+    get:
+      summary: Get organizer by event id
+      operationId: getOrganizerByEventId
+      tags:
+        - Organizer
+        - Event
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Organizer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizerDto'
+        '404':
+          description: Organizer not found for the given event.
+  /v1/payments:
+    post:
+      summary: Create payment
+      operationId: createPayment
+      tags:
+        - Payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentDto'
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Payment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentDto'
+  /v1/payments/by-event/{eventId}:
+    get:
+      summary: List payments by event
+      operationId: listPaymentsByEventAlt
+      tags:
+        - Payment
+        - Event
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Payments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentDto'
+  /v1/promotions:
+    post:
+      summary: Create promotion
+      operationId: createPromotion
+      tags:
+        - Promotion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PromotionDto'
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Promotion created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromotionDto'
+  /v1/promotions/by-event/{eventId}:
+    get:
+      summary: List promotions by event
+      operationId: listPromotionsByEventAlt
+      tags:
+        - Promotion
+        - Event
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Promotions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PromotionDto'
+  /v1/refunds:
+    post:
+      summary: Create refund
+      operationId: createRefund
+      tags:
+        - Refund
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefundDto'
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Refund created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefundDto'
+  /v1/refunds/by-event/{eventId}:
+    get:
+      summary: List refunds by event
+      operationId: listRefundsByEventAlt
+      tags:
+        - Refund
+        - Event
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Refunds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RefundDto'
+  /v1/ticket-categories/{ticketCategoryId}/tickets:
+    get:
+      summary: List tickets by ticket category
+      operationId: listTicketsByTicketCategory
+      tags:
+        - Ticket
+        - TicketCategory
+      parameters:
+        - in: path
+          name: ticketCategoryId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tickets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TicketDto'
+  /v1/ticket-categories/{ticketCategoryId}/sub-events:
+    get:
+      summary: List sub events links by ticket category
+      operationId: listSubEventsByTicketCategory
+      tags:
+        - SubEvent
+        - TicketCategory
+      parameters:
+        - in: path
+          name: ticketCategoryId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Ticket sub events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TicketSubEventDto'
+  /v1/bookings/{bookingId}:
+    get:
+      summary: Get booking with tickets and ticketCategory
+      operationId: getBookingExpanded
+      tags:
+        - Booking
+      parameters:
+        - in: path
+          name: bookingId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Booking expanded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingDto'
 components:
   securitySchemes:
     bearerAuth:
