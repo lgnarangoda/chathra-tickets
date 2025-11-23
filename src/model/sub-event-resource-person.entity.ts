@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { SubEvent } from './sub-event.entity';
+import { SubEvent } from '../sub-event/model/sub-event.entity';
 import { ResourcePerson } from './resource-person.entity';
 import { File } from './file.entity';
 

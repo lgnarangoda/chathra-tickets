@@ -1,5 +1,5 @@
 import type { FileDto } from './file.dto';
-import type { OrganizerDto } from './organizer.dto';
+import type { OrganizerDto } from '../../organizer/model/dto/organizer.dto';
 import type { UserDto } from './user.dto';
 
 export class OrganizerDocumentDto {

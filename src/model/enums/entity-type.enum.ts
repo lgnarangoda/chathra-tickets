@@ -1,5 +1,5 @@
 export enum EntityType {
-  EVENT = 'event',
-  SUB_EVENT = 'sub_event',
+  EVENT = 'EVENT',
+  SUB_EVENT = 'SUB_EVENT',
 }
 

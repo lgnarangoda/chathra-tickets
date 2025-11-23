@@ -1,11 +1,11 @@
 export enum EventCategory {
-  CONCERT = 'concert',
-  CONFERENCE = 'conference',
-  WORKSHOP = 'workshop',
-  SEMINAR = 'seminar',
-  FESTIVAL = 'festival',
-  SPORTS = 'sports',
-  THEATER = 'theater',
-  OTHER = 'other',
+  CONCERT = 'CONCERT',
+  CONFERENCE = 'CONFERENCE',
+  WORKSHOP = 'WORKSHOP',
+  SEMINAR = 'SEMINAR',
+  FESTIVAL = 'FESTIVAL',
+  SPORTS = 'SPORTS',
+  THEATER = 'THEATER',
+  OTHER = 'OTHER',
 }
 

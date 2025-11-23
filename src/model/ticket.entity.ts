@@ -8,9 +8,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { TicketCategory } from './ticket-category.entity';
+import { TicketCategory } from '../ticket-category/model/ticket-category.entity';
 import { User } from './user.entity';
-import { Booking } from './booking.entity';
+import { Booking } from '../booking/model/booking.entity';
 import { TicketStatus } from './enums/ticket-status.enum';
 import { BaseEntity } from './base.entity';
 

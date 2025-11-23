@@ -1,4 +1,4 @@
-import type { EventDto } from './event.dto';
+import type { EventDto } from '../../event/model/dto/event.dto';
 import type { VenueDto } from '../../venue/model/dto/venue.dto';
 
 export class EventVenueDto {

@@ -10,9 +10,9 @@ import { UserRole } from './user-role.entity';
 import { OrganizerDocument } from './organizer-document.entity';
 import { ChangeRequest } from './change-request.entity';
 import { Ticket } from './ticket.entity';
-import { Booking } from './booking.entity';
-import { Refund } from './refund.entity';
-import { Promotion } from './promotion.entity';
+import { Booking } from '../booking/model/booking.entity';
+import { Refund } from '../refund/model/refund.entity';
+import { Promotion } from '../promotion/model/promotion.entity';
 import { Approval } from './approval.entity';
 import { UserStatus } from './enums/user-status.enum';
 

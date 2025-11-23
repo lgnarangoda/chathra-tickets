@@ -1,7 +1,7 @@
 import { TicketStatus } from '../enums/ticket-status.enum';
 import { BaseDto } from './base.dto';
-import type { BookingDto } from './booking.dto';
-import type { TicketCategoryDto } from './ticket-category.dto';
+import type { BookingDto } from '../../booking/model/dto/booking.dto';
+import type { TicketCategoryDto } from '../../ticket-category/model/dto/ticket-category.dto';
 import type { UserDto } from './user.dto';
 
 export class TicketDto extends BaseDto {

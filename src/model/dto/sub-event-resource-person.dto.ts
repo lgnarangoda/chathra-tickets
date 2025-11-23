@@ -1,6 +1,6 @@
 import type { FileDto } from './file.dto';
 import type { ResourcePersonDto } from './resource-person.dto';
-import type { SubEventDto } from './sub-event.dto';
+import type { SubEventDto } from '../../sub-event/model/dto/sub-event.dto';
 
 export class SubEventResourcePersonDto {
   id: number;
