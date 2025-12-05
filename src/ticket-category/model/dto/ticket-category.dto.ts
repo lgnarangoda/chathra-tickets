@@ -1,31 +1,70 @@
+import { IsNotEmpty, IsNumber, IsOptional, IsString, IsEnum, IsInt, Min, IsArray, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 import { TicketCategoryStatus } from '../../../model/enums/ticket-category-status.enum';
 import type { EventDto } from '../../../event/model/dto/event.dto';
 import type { TicketDto } from '../../../model/dto/ticket.dto';
 import type { TicketSubEventDto } from './ticket-sub-event.dto';
 
 export class TicketCategoryDto {
-  ticketCategoryId: number;
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  ticketCategoryId?: number;
 
+  @IsNotEmpty()
+  @Type(() => Number)
+  @IsNumber()
   eventId: number;
 
-  name: string | null;
+  @IsOptional()
+  @IsString()
+  name?: string | null;
 
-  description: string | null;
+  @IsOptional()
+  @IsString()
+  description?: string | null;
 
-  basePrice: number | null;
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  basePrice?: number | null;
 
-  maxQuantity: number | null;
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  maxQuantity?: number | null;
 
-  minQuantity: number | null;
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  minQuantity?: number | null;
 
-  status: TicketCategoryStatus;
+  @IsOptional()
+  @IsEnum(TicketCategoryStatus)
+  status?: TicketCategoryStatus;
 
-  seatMap: string | null;
+  @IsOptional()
+  @IsString()
+  seatMap?: string | null;
 
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => Object)
   event?: EventDto;
 
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => Object)
   ticketSubEvents?: TicketSubEventDto[];
 
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => Object)
   tickets?: TicketDto[];
 }
 
