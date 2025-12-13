@@ -43,6 +43,23 @@ RUN pnpm prune --prod
 # Stage 2: Production
 FROM node:20-alpine AS production
 
+# Re-declare build arguments (ARGs don't persist across stages)
+ARG NODE_ENV
+ARG DB_TYPE
+ARG DATABASE_HOST
+ARG DATABASE_PORT
+ARG DATABASE_USERNAME
+ARG DATABASE_PASSWORD
+ARG DATABASE_SCHEMA
+ARG DATABASE
+ARG DB_SYNC
+ARG DROP_SCHEMA
+ARG DATABASE_SSL
+ARG DATABASE_SSL_REJECT_UNAUTHORIZED
+ARG JWT_SECRET
+ARG JWT_EXPIRES_IN
+ARG PORT
+
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
