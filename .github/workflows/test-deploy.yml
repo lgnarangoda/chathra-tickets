@@ -86,7 +86,7 @@ jobs:
             echo "Note: Environment variables are already baked into the image at build time"
             sudo docker run -d \
               --name chathra-tickets-backend \
-              -p 3000:3000 \
+              -p 4000:4000 \
               --restart unless-stopped \
               ${{ secrets.DOCKERHUB_USERNAME }}/chathra-tickets-backend:latest
 
