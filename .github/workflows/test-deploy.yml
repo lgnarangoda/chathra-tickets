@@ -1,0 +1,97 @@
+name: Build, Push, and Deploy Backend (Test)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  BACKEND_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/chathra-tickets-backend:latest
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Verify secrets are loaded
+        run: |
+          echo "Checking if secrets are available..."
+          echo "DATABASE_HOST is set: ${{ secrets.DATABASE_HOST != '' }}"
+          echo "DATABASE is set: ${{ secrets.DATABASE != '' }}"
+          echo "DATABASE_USERNAME is set: ${{ secrets.DATABASE_USERNAME != '' }}"
+          echo "DATABASE_PASSWORD is set: ${{ secrets.DATABASE_PASSWORD != '' }}"
+
+      - name: Build & Push Docker image
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            --build-arg NODE_ENV=development \
+            --build-arg DB_TYPE=${{ secrets.DB_TYPE }} \
+            --build-arg DATABASE_HOST=${{ secrets.DATABASE_HOST }} \
+            --build-arg DATABASE_PORT=${{ secrets.DATABASE_PORT }} \
+            --build-arg DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }} \
+            --build-arg DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+            --build-arg DATABASE_SCHEMA=${{ secrets.DATABASE_SCHEMA }} \
+            --build-arg DATABASE=${{ secrets.DATABASE }} \
+            --build-arg DB_SYNC=${{ secrets.DB_SYNC }} \
+            --build-arg DROP_SCHEMA=${{ secrets.DROP_SCHEMA }} \
+            --build-arg DATABASE_SSL=${{ secrets.DATABASE_SSL }} \
+            --build-arg DATABASE_SSL_REJECT_UNAUTHORIZED=${{ secrets.DATABASE_SSL_REJECT_UNAUTHORIZED }} \
+            --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            --build-arg JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }} \
+            --build-arg PORT=4000 \
+            -t ${{ env.BACKEND_IMAGE }} \
+            --push .
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - name: Deploy to Test VM over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USERNAME }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          port: 22
+          script: |
+            echo "Logging in to Docker Hub…"
+            sudo docker login \
+              -u ${{ secrets.DOCKERHUB_USERNAME }} \
+              -p ${{ secrets.DOCKERHUB_TOKEN }}
+
+            echo "Stopping old backend container…"
+            sudo docker stop chathra-tickets-backend || true
+            sudo docker rm chathra-tickets-backend || true
+
+            echo "Pulling latest backend image…"
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/chathra-tickets-backend:latest
+
+            echo "Running backend container on port 4000…"
+            echo "Note: Environment variables are already baked into the image at build time"
+            sudo docker run -d \
+              --name chathra-tickets-backend \
+              -p 4000:4000 \
+              --restart unless-stopped \
+              ${{ secrets.DOCKERHUB_USERNAME }}/chathra-tickets-backend:latest
+
+            echo "Verifying container is running…"
+            sleep 5
+            sudo docker ps | grep chathra-tickets-backend
+            echo "Container logs:"
+            sudo docker logs chathra-tickets-backend --tail 20

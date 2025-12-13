@@ -4,6 +4,7 @@ export enum ConfigKey {
   App = 'APP',
   Db = 'DB',
   Type = 'TYPEORM',
+  Jwt = 'JWT',
 }
 
 export enum Environment {
@@ -41,6 +42,18 @@ const TypeOrmConfig = registerAs(ConfigKey.Type, () => ({
   migrations: ['dist/migrations/*{.ts,.js}'],
   autoLoadEntities: true,
   synchronize: true,
+  ssl:
+    process.env.DATABASE_SSL === 'true'
+      ? {
+          rejectUnauthorized:
+            process.env.DATABASE_SSL_REJECT_UNAUTHORIZED !== 'false',
+        }
+      : false,
 }));
 
-export const configurations = [APPConfig, DBConfig, TypeOrmConfig];
+const JwtConfig = registerAs(ConfigKey.Jwt, () => ({
+  secret: process.env.JWT_SECRET || 'secretKey',
+  expiresIn: process.env.JWT_EXPIRES_IN || '60m',
+}));
+
+export const configurations = [APPConfig, DBConfig, TypeOrmConfig, JwtConfig];
