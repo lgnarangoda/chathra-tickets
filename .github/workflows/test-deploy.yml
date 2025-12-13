@@ -8,7 +8,7 @@ on:
 
 env:
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-  BACKEND_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/ccs-backend:latest
+  BACKEND_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/chathra-tickets-backend:latest
 
 jobs:
   build-and-push:
@@ -76,22 +76,22 @@ jobs:
               -p ${{ secrets.DOCKERHUB_TOKEN }}
 
             echo "Stopping old backend container…"
-            sudo docker stop ccs-backend || true
-            sudo docker rm ccs-backend || true
+            sudo docker stop chathra-tickets-backend || true
+            sudo docker rm chathra-tickets-backend || true
 
             echo "Pulling latest backend image…"
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ccs-backend:latest
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/chathra-tickets-backend:latest
 
             echo "Running backend container on port 4000…"
             echo "Note: Environment variables are already baked into the image at build time"
             sudo docker run -d \
-              --name ccs-backend \
+              --name chathra-tickets-backend \
               -p 4000:4000 \
               --restart unless-stopped \
-              ${{ secrets.DOCKERHUB_USERNAME }}/ccs-backend:latest
+              ${{ secrets.DOCKERHUB_USERNAME }}/chathra-tickets-backend:latest
 
             echo "Verifying container is running…"
             sleep 5
-            sudo docker ps | grep ccs-backend
+            sudo docker ps | grep chathra-tickets-backend
             echo "Container logs:"
             sudo docker logs ccs-backend --tail 20
