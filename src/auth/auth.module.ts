@@ -7,14 +7,17 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { LocalStrategy } from './local.strategy';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { RefreshToken } from './model/refresh-token.entity';
 
 @Module({
   imports: [
     UserModule,
     PassportModule,
+    TypeOrmModule.forFeature([RefreshToken]),
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'secretKey',
-      signOptions: { expiresIn: process.env.JWT_EXPIRES_IN || '60m' },
+      signOptions: { expiresIn: process.env.JWT_EXPIRES_IN || '30s' },
     }),
   ],
   providers: [AuthService, JwtStrategy, LocalStrategy],

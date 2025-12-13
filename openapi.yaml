@@ -686,6 +686,50 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RefundDto'
+  /v1/ticket-categories:
+    post:
+      summary: Create ticket categories
+      description: Creates one or more ticket categories for an event.
+      operationId: createTicketCategories
+      tags:
+        - TicketCategory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TicketCategoryCreateRequest'
+            examples:
+              default:
+                value:
+                  - eventId: 1
+                    name: VIP Tickets
+                    description: Premium seating with exclusive access
+                    basePrice: 150.00
+                    maxQuantity: 10
+                    minQuantity: 1
+                    status: ACTIVE
+                    seatMap: section-a-vip
+                  - eventId: 1
+                    name: General Admission
+                    description: Standard entry tickets
+                    basePrice: 50.00
+                    maxQuantity: 5
+                    minQuantity: 1
+                    status: ACTIVE
+      responses:
+        '201':
+          description: Ticket categories created successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TicketCategoryDto'
+        '400':
+          description: Validation error or missing required fields.
   /v1/ticket-categories/{ticketCategoryId}/tickets:
     get:
       summary: List tickets by ticket category
@@ -1695,6 +1739,50 @@ components:
               items:
                 $ref: '#/components/schemas/TicketSubEventDto'
               nullable: true
+    TicketCategoryCreateRequest:
+      type: object
+      required:
+        - eventId
+      properties:
+        ticketCategoryId:
+          type: integer
+          format: int64
+          description: Optional. Auto-generated if not provided.
+        eventId:
+          type: integer
+          format: int64
+          description: Required. The ID of the event this ticket category belongs to.
+        name:
+          type: string
+          nullable: true
+          description: Name of the ticket category (e.g., "VIP Tickets", "General Admission").
+        description:
+          type: string
+          nullable: true
+          description: Description of the ticket category.
+        basePrice:
+          type: number
+          format: double
+          minimum: 0
+          nullable: true
+          description: Base price for tickets in this category. Must be >= 0.
+        maxQuantity:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Maximum quantity of tickets that can be purchased per transaction. Must be >= 1.
+        minQuantity:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Minimum quantity of tickets that must be purchased per transaction. Must be >= 1.
+        status:
+          $ref: '#/components/schemas/TicketCategoryStatus'
+          description: Status of the ticket category. Defaults to ACTIVE if not provided.
+        seatMap:
+          type: string
+          nullable: true
+          description: Seat map identifier or reference for this ticket category.
     TicketCategoryDto:
       type: object
       required:

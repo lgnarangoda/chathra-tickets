@@ -7,9 +7,10 @@ import { UserModule } from './user/user.module';
 import { VenueModule } from './venue/venue.module';
 import { EventModule } from './event/event.module';
 import { OrganizerModule } from './organizer/organizer.module';
+import { TicketCategoryModule } from './ticket-category/ticket-category.module';
 
 @Module({
-  imports: [AuthModule, UserModule, ConfigsModule, VenueModule, EventModule, OrganizerModule],
+  imports: [AuthModule, UserModule, ConfigsModule, VenueModule, EventModule, OrganizerModule, TicketCategoryModule],
   controllers: [AppController],
   providers: [AppService],
 })
