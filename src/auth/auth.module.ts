@@ -15,6 +15,7 @@ import { RefreshToken } from './model/refresh-token.entity';
   imports: [
     UserModule,
     PassportModule,
+    TypeOrmModule.forFeature([RefreshToken]),
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => {
         const jwtConfig = configService.get('JWT');

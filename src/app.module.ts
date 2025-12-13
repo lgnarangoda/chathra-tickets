@@ -10,7 +10,15 @@ import { OrganizerModule } from './organizer/organizer.module';
 import { TicketCategoryModule } from './ticket-category/ticket-category.module';
 
 @Module({
-  imports: [AuthModule, UserModule, ConfigsModule, VenueModule, EventModule, OrganizerModule, TicketCategoryModule],
+  imports: [
+    AuthModule,
+    UserModule,
+    ConfigsModule,
+    VenueModule,
+    EventModule,
+    OrganizerModule,
+    TicketCategoryModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
