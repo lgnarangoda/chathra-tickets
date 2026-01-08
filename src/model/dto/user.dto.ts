@@ -19,6 +19,8 @@ export class UserDto {
 
   passwordHash: string;
 
+  supabaseUserId: string;
+
   status: UserStatus;
 
   isGuest: boolean;

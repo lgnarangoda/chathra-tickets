@@ -3,4 +3,5 @@ export interface User {
   username: string;
   passwordHash: string;
   isAdmin: boolean;
+  supabaseUserId: string;
 }

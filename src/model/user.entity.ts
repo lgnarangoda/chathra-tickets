@@ -30,7 +30,10 @@ export class User {
   @Column({ type: 'varchar', length: 20, nullable: true })
   phone: string;
 
-  @Column({ type: 'varchar', length: 255, name: 'password_hash' })
+  @Column({ type: 'varchar', length: 255, name: 'supabase_user_id', unique: true, nullable: true })
+  supabaseUserId: string;
+
+  @Column({ type: 'varchar', length: 255, name: 'password_hash', nullable: true })
   passwordHash: string;
 
   @Column({
